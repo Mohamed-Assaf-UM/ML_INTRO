@@ -419,3 +419,134 @@ So, every time you compute this, you **update θ** to a new value. You keep doin
 
 ![image](https://github.com/user-attachments/assets/96f781ac-0ddd-4ebb-98b1-5f976433cb42)
 
+## Multiple Linear Regression:
+![image](https://github.com/user-attachments/assets/1a0101f2-4023-4598-b834-cd00f4cbcfb0)
+![image](https://github.com/user-attachments/assets/851edf3b-6c57-4569-8551-f70e385102f1)
+### **R-Squared (R²) Explained in Simple Terms**
+
+**R-squared (R²)** tells you how well your linear regression model fits the data. It explains what percentage of the variation in the target variable (y) can be explained by the input features (x).
+
+- **R² value** ranges between 0 and 1:
+  - **1** means **perfect fit** (all the data points fall exactly on the regression line).
+  - **0** means the model doesn’t explain any variation in the data.
+  
+![image](https://github.com/user-attachments/assets/1578fc4f-6c11-4c0b-91a0-40d001e8d2db)
+
+
+#### **Example**:
+Let’s say you’re predicting house prices:
+- Your R² is 0.8. This means that 80% of the variation in house prices can be explained by the input features (like size, location, etc.).
+
+### **Adjusted R-Squared Explained**
+
+**Adjusted R-squared** is a modified version of R² that **penalizes** for adding too many features to the model. It adjusts R² by accounting for the number of predictors (features) used, preventing overfitting.
+
+![image](https://github.com/user-attachments/assets/892e4da9-4027-44a1-bb1b-4581b9866129)
+
+Where:
+- n is the number of data points.
+- p is the number of predictors (features).
+
+#### **Why Adjusted R²?**
+- If you keep adding features, R² may increase, but those features might not actually improve the model.
+- **Adjusted R²** increases only if the new feature improves the model more than would be expected by chance.
+
+#### **Example**:
+If you add an irrelevant feature (like color of the house), **R² might increase slightly**, but **Adjusted R²** will decrease because the feature doesn’t add meaningful information.
+
+### **Summary**:
+- **R²**: How well your model fits the data.
+- **Adjusted R²**: Takes into account the number of predictors to avoid overfitting.
+
+![image](https://github.com/user-attachments/assets/f0619d23-b1c2-4e5c-9867-8f9397112432)
+
+### What is Polynomial Regression?
+
+**Polynomial Regression** is a type of regression where the relationship between the input variables (features) and the output (target) is modeled as a **polynomial** rather than a straight line (like in linear regression).
+
+In simple terms, instead of fitting a **straight line**, you fit a **curved line** to capture the relationship between variables.
+
+### Why Use Polynomial Regression?
+
+- Linear regression fits data with a straight line, but some data points might have a **curved pattern**.
+- Polynomial regression is useful when the data shows **non-linear trends**.
+
+### The Equation of Polynomial Regression
+
+For a **2nd-degree polynomial** (quadratic), the equation looks like this:
+![image](https://github.com/user-attachments/assets/55cde5e9-46eb-48f9-b810-4b2838162b10)
+
+Where the highest exponent n represents the degree of the polynomial.
+
+### Example
+
+Let’s say you are modeling the **sales** of ice cream based on **temperature**. In this case:
+- If sales increase with temperature up to a point and then decrease when it gets too hot, a **straight line** (linear regression) won’t fit well.
+- A **curve** might better represent this trend, like a **parabola** (2nd-degree polynomial).
+
+### Simple Process:
+
+1. **Fit the model**: Choose the degree of the polynomial (e.g., 2nd degree for a parabola).
+2. **Train the model**: Use data to find the best coefficients \( \theta \).
+3. **Predict values**: The model will predict new values by fitting a curve through the data points.
+
+### Summary:
+- **Linear regression** fits a straight line.
+- **Polynomial regression** fits a curve to capture more complex relationships between variables.
+### 1. **Mean Squared Error (MSE)**
+
+**MSE** is a way to measure how far off your predictions are from the actual values. It calculates the average of the **squared differences** between the predicted and actual values.
+
+![image](https://github.com/user-attachments/assets/2c44d689-e646-44db-9e92-9f1bd5ff82da)
+
+
+**Why Squared?**  
+The squaring ensures that both over-predictions and under-predictions are treated equally. Larger errors are punished more due to squaring.
+
+**Real-time example**:
+If you're predicting **house prices** and your model's predictions for 5 houses are:
+- Actual prices: 200k, 250k, 300k, 350k, 400k
+- Predicted prices: 220k, 240k, 310k, 330k, 390k
+
+![image](https://github.com/user-attachments/assets/717bf666-6d48-4fd3-9059-bb3a61cc9ef8)
+
+
+---
+
+### 2. **Root Mean Squared Error (RMSE)**
+
+**RMSE** is just the square root of MSE. It brings the units of the error back to the original scale of the target variable (e.g., dollars, meters).
+
+**Formula**:
+![image](https://github.com/user-attachments/assets/592f377b-ed9e-435f-a014-32efeb5b8d92)
+
+**Why RMSE?**  
+It gives a clearer picture of how much your predictions are off, in the same units as the data, which makes it easier to interpret.
+
+**Real-time example**:
+For the house price prediction example above, after calculating the MSE, you take the square root of the MSE to get RMSE. This gives you an error in terms of actual house prices, making it more interpretable.
+
+---
+
+### 3. **Mean Absolute Error (MAE)**
+
+**MAE** is the average of the **absolute differences** between predicted and actual values. Unlike MSE, it doesn’t square the errors, so it’s less sensitive to large errors.
+
+![image](https://github.com/user-attachments/assets/3467ff91-9e48-4c2b-9cd5-fbd4170a4451)
+
+
+**Real-time example**:
+Using the same house price predictions:
+- Actual prices: 200k, 250k, 300k, 350k, 400k
+- Predicted prices: 220k, 240k, 310k, 330k, 390k
+
+![image](https://github.com/user-attachments/assets/82e526ad-b25d-453e-aded-c1d7c312de73)
+
+---
+
+### Summary:
+- **MSE**: Punishes large errors more (due to squaring).
+- **RMSE**: Square root of MSE, so it's easier to interpret.
+- **MAE**: Average of absolute errors, simpler but less sensitive to large errors.
+
+Would you like any further examples or clarification?
