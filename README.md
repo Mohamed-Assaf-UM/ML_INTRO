@@ -1254,3 +1254,228 @@ In **Time Series Cross-Validation**, data is split based on time, which is impor
 ---
 
 
+### Simple Notes on the Code
+
+1. **Importing Required Libraries**:
+   - `pandas`, `numpy`, `matplotlib.pyplot`, and `seaborn` are imported for data manipulation and visualization.
+   - `%matplotlib inline` ensures that plots are displayed inline within the Jupyter Notebook.
+
+   ```python
+   import pandas as pd
+   import numpy as np
+   import matplotlib.pyplot as plt
+   import seaborn as sns
+   %matplotlib inline
+   ```
+
+2. **Loading Dataset**:
+   - The cleaned Algerian forest fires dataset is read using `pandas`.
+   - The `.head()` function is used to display the first few rows of the dataset.
+
+   ```python
+   df = pd.read_csv('Algerian_forest_fires_cleaned_dataset.csv')
+   df.head()
+   ```
+
+3. **Dropping Unnecessary Columns**:
+   - The columns 'day', 'month', and 'year' are dropped from the dataset since they are not required for the analysis.
+   
+   ```python
+   df.drop(['day', 'month', 'year'], axis=1, inplace=True)
+   ```
+
+4. **Encoding the 'Classes' Column**:
+   - The 'Classes' column is encoded into binary values, where "not fire" is replaced by 0 and "fire" by 1, making it easier to work with.
+
+   ```python
+   df['Classes'] = np.where(df['Classes'].str.contains("not fire"), 0, 1)
+   ```
+
+5. **Independent and Dependent Features**:
+   - `X` contains all the columns except 'FWI', which is the dependent feature (target variable).
+   - `y` is the 'FWI' column, which we aim to predict.
+
+   ```python
+   X = df.drop('FWI', axis=1)
+   y = df['FWI']
+   ```
+
+6. **Train-Test Split**:
+   - The dataset is split into training and testing sets. 25% of the data is used for testing, while 75% is used for training.
+   - `random_state=42` ensures the results are reproducible.
+
+   ```python
+   from sklearn.model_selection import train_test_split
+   X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, random_state=42)
+   ```
+
+7. **Correlation Matrix**:
+   - A correlation matrix is calculated for the training data to analyze relationships between variables. This helps identify multicollinearity (where one variable is highly correlated with another).
+   - The heatmap is plotted using `seaborn` to visualize the correlation.
+
+   ```python
+   X_train.corr()
+   plt.figure(figsize=(12, 10))
+   sns.heatmap(X_train.corr(), annot=True)
+   ```
+
+8. **Removing Multicollinearity**:
+   - A custom function is defined to detect columns with a correlation greater than a threshold (0.85 in this case).
+   - Highly correlated features are dropped from both the training and testing sets to avoid multicollinearity, reducing the feature set for the model.
+
+   ```python
+   def correlation(dataset, threshold):
+       col_corr = set()
+       corr_matrix = dataset.corr()
+       for i in range(len(corr_matrix.columns)):
+           for j in range(i):
+               if abs(corr_matrix.iloc[i, j]) > threshold:
+                   colname = corr_matrix.columns[i]
+                   col_corr.add(colname)
+       return col_corr
+   corr_features = correlation(X_train, 0.85)
+   X_train.drop(corr_features, axis=1, inplace=True)
+   X_test.drop(corr_features, axis=1, inplace=True)
+   ```
+
+   After removing the highly correlated features, the dimensions of the training and test sets are updated.
+
+---
+
+Sure! Let’s break down the `corr_features` code and explain it step-by-step using an example.
+
+### Code Explanation:
+
+```python
+def correlation(dataset, threshold):
+    col_corr = set()  # Step 1: Create an empty set to store highly correlated features
+    corr_matrix = dataset.corr()  # Step 2: Compute the correlation matrix of the dataset
+    for i in range(len(corr_matrix.columns)):  # Step 3: Loop through columns
+        for j in range(i):  # Step 4: Loop through the previous columns (to avoid repetition)
+            if abs(corr_matrix.iloc[i, j]) > threshold:  # Step 5: Check if correlation is above the threshold
+                colname = corr_matrix.columns[i]  # Step 6: Get the column name
+                col_corr.add(colname)  # Step 7: Add the column name to the set
+    return col_corr  # Step 8: Return the set of highly correlated features
+
+corr_features = correlation(X_train, 0.85)  # Call the function with a threshold of 0.85
+```
+
+### Breakdown with an Example:
+
+Suppose we have the following correlation matrix:
+
+|        | Feature A | Feature B | Feature C | Feature D |
+|--------|-----------|-----------|-----------|-----------|
+|**Feature A**| 1         | 0.9       | 0.3       | 0.1       |
+|**Feature B**| 0.9       | 1         | 0.2       | 0.05      |
+|**Feature C**| 0.3       | 0.2       | 1         | 0.85      |
+|**Feature D**| 0.1       | 0.05      | 0.85      | 1         |
+
+Here’s how the code works with this matrix:
+
+1. **Step 1**: An empty set `col_corr` is created to store the names of highly correlated features.
+   
+2. **Step 2**: `dataset.corr()` calculates the correlation matrix, as shown above.
+
+3. **Step 3 and 4**: The code loops over the columns of the matrix. It only compares the values below the diagonal (since the correlation matrix is symmetrical).
+
+4. **Step 5**: It checks if the absolute value of the correlation is greater than the threshold (0.85 in this case).
+
+   - When comparing **Feature A** and **Feature B** (correlation = 0.9), since 0.9 > 0.85, the code identifies **Feature A** as highly correlated.
+   - When comparing **Feature C** and **Feature D** (correlation = 0.85), since 0.85 == 0.85, the code identifies **Feature C** as highly correlated.
+
+5. **Step 6**: For each highly correlated pair, the column name of the feature is stored. For **Feature A** and **Feature B**, it stores the name of **Feature A** (because the correlation is above 0.85). For **Feature C** and **Feature D**, it stores **Feature C**.
+
+6. **Step 7**: These column names are added to the `col_corr` set.
+
+7. **Step 8**: The set `col_corr` now contains `{'Feature A', 'Feature C'}` and is returned.
+
+### Example Output:
+
+```python
+corr_features = {'Feature A', 'Feature C'}
+```
+
+These features are considered **highly correlated** and will be dropped from the training and testing sets to avoid redundancy in the model.
+
+### Why Drop These Features?
+- **Feature A** is highly correlated with **Feature B**, so dropping **Feature A** keeps **Feature B**.
+- **Feature C** is highly correlated with **Feature D**, so dropping **Feature C** keeps **Feature D**.
+
+In summary, the function finds features that have high correlation (above the threshold of 0.85) and stores them in the `corr_features` set to remove them from the dataset, reducing multicollinearity.
+Here's a breakdown of the methods used in each section of your code with examples and explanations:
+
+### 1. **Linear Regression**
+```python
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_absolute_error, r2_score
+linreg = LinearRegression()
+linreg.fit(X_train_scaled, y_train)  # Fits the model to the training data
+y_pred = linreg.predict(X_test_scaled)  # Predicts target values using the test data
+mae = mean_absolute_error(y_test, y_pred)  # Calculates MAE
+score = r2_score(y_test, y_pred)  # Calculates R2 score
+print("Mean absolute error", mae)
+print("R2 Score", score)
+plt.scatter(y_test, y_pred)  # Scatter plot of actual vs predicted values
+```
+- **LinearRegression()**: This model attempts to find a linear relationship between the input features (`X_train_scaled`) and the target variable (`y_train`). It learns the coefficients (weights) for each feature that minimize the prediction error.
+  - **Example**: Suppose we are predicting house prices based on features like square footage, the number of rooms, etc. Linear regression tries to find a straight-line equation that best fits this data.
+
+- **fit()**: This method trains the model on the data. It calculates the best-fitting coefficients (slopes) and intercept to minimize the error between predicted and actual values.
+  - **Example**: The model learns that increasing the square footage increases the price by a certain amount, and adjusts the weights for each feature accordingly.
+
+- **predict()**: This method uses the trained model to make predictions on new data (`X_test_scaled`).
+  - **Example**: The model predicts house prices for new houses not seen during training.
+
+- **mean_absolute_error()**: Measures the average of the absolute differences between predicted and actual values.
+  - **Example**: If the predicted price is \$500K but the actual price is \$505K, the error is \$5K. MAE aggregates all such errors for the test data.
+
+- **r2_score()**: Measures the proportion of variance in the dependent variable explained by the model. A value of 1.0 means the model explains all the variance, while 0 means it explains none.
+  - **Example**: An R2 score of 0.98 suggests that 98% of the variance in house prices is explained by the features in the model.
+
+### 2. **Lasso Regression**
+```python
+from sklearn.linear_model import Lasso
+lasso = Lasso()
+lasso.fit(X_train_scaled, y_train)
+y_pred = lasso.predict(X_test_scaled)
+mae = mean_absolute_error(y_test, y_pred)
+score = r2_score(y_test, y_pred)
+print("Mean absolute error", mae)
+print("R2 Score", score)
+plt.scatter(y_test, y_pred)
+```
+- **Lasso()**: This is a variation of linear regression that adds regularization (penalization of large coefficients). It’s useful for feature selection because it can shrink some coefficients to zero, effectively removing irrelevant features.
+  - **Example**: If we have 100 features but only 10 are relevant, Lasso might set the coefficients of the 90 irrelevant features to zero, simplifying the model.
+
+- **fit()** and **predict()**: Same as in linear regression, but with Lasso regularization.
+  - **Example**: Lasso might discover that only square footage and location significantly impact house prices, ignoring minor features like the color of the house.
+
+- **mean_absolute_error()** and **r2_score()**: Same metrics as used in linear regression, measuring the performance of the Lasso model.
+
+### 3. **Lasso Cross Validation (LassoCV)**
+```python
+from sklearn.linear_model import LassoCV
+lassocv = LassoCV(cv=5)  # 5-fold cross-validation
+lassocv.fit(X_train_scaled, y_train)
+print(lassocv.alpha_)  # Optimal alpha
+print(lassocv.alphas_)  # Array of alpha values tested
+print(lassocv.mse_path_)  # MSE values during cross-validation
+```
+- **LassoCV()**: This performs Lasso regression with built-in cross-validation to automatically determine the best value of `alpha`, the regularization parameter. Cross-validation splits the data into `k` subsets and uses `k-1` subsets to train the model, testing it on the remaining subset. This process is repeated `k` times (in this case, 5).
+  - **Example**: Instead of manually tuning `alpha` (regularization strength), `LassoCV` finds the best value by trying multiple values and selecting the one that gives the best performance on validation data.
+
+- **alpha_**: The optimal value of `alpha` (regularization strength) found during cross-validation.
+  - **Example**: A smaller alpha means less regularization, while a larger alpha penalizes large coefficients more.
+
+- **alphas_**: An array of the different alpha values tried during cross-validation.
+  - **Example**: LassoCV tries multiple `alpha` values, like 0.1, 0.01, 0.001, etc., and picks the best.
+
+- **mse_path_**: This stores the mean squared error for each fold of the cross-validation for each value of `alpha`.
+  - **Example**: For each alpha, the cross-validation process evaluates the error on unseen data, helping select the best alpha value.
+
+### Visualization
+The scatter plot generated by `plt.scatter(y_test, y_pred)` in both Linear and Lasso regression compares the actual (`y_test`) vs predicted (`y_pred`) values:
+- **Example**: If the points lie along the 45-degree line, it means the model's predictions match the actual values closely, indicating a good fit.
+
+This set of methods allows you to compare models, understand the effect of regularization, and fine-tune the model for better performance through cross-validation.
