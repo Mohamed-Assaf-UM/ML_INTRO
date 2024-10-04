@@ -1036,3 +1036,221 @@ def poly_regression(degree):
 - The **pipeline** simplifies the process of polynomial regression by combining the transformation of features and the linear regression model into a single step.
 - This means that whenever you call `fit` or `predict`, the pipeline takes care of applying the polynomial transformation and then fitting or predicting with the linear regression model automatically.
 - This makes your code cleaner, more organized, and easier to maintain!
+### Ridge, Lasso, and Elastic Net Regression: Detailed Explanation
+
+These three techniques—**Ridge**, **Lasso**, and **Elastic Net**—are extensions of **linear regression** aimed at addressing its limitations, especially **overfitting**. They are types of **regularization techniques**, which modify the linear regression model to ensure better predictions on unseen data.
+
+
+### 1. **Ridge Regression (L2 Regularization)**
+
+**Definition:**
+Ridge regression adds a penalty to the sum of squared coefficients (weights) in linear regression, which discourages large coefficients.
+
+- In **linear regression**, we aim to minimize the **sum of squared residuals** (errors) between predicted and actual values.
+  
+- In **ridge regression**, we also add a **penalty term**, which is proportional to the **sum of the squares of the coefficients** (also known as the L2 norm).
+
+  **Formula:**
+![image](https://github.com/user-attachments/assets/37ad23a8-6da0-472b-a0c1-3c690793c441)
+
+  When λ=0, ridge regression behaves like normal linear regression, and when λ increases, the model increasingly shrinks the coefficients toward zero.
+
+**Real-Time Example:**
+Imagine you are predicting **house prices** based on multiple features like square footage, number of bedrooms, location, etc. If some features are highly correlated (like size of the house and number of rooms), ridge regression helps by reducing the impact of these correlated features to avoid overfitting.
+
+**Pros:**
+- Reduces overfitting, especially in cases of multicollinearity.
+- Keeps all features in the model (does not eliminate any).
+- Works well when there are many predictors.
+
+**Cons:**
+- It doesn't reduce the number of features, so interpretability may suffer.
+- It only shrinks the coefficients; it doesn’t set any to zero.
+
+---
+
+### 2. **Lasso Regression (L1 Regularization)**
+
+**Definition:**
+Lasso regression adds a penalty equal to the **absolute value** of the magnitude of coefficients. This is known as the **L1 norm**.
+
+- Lasso is used when we want to **perform feature selection** in addition to **reducing overfitting**.
+
+  **Formula:**
+  ![image](https://github.com/user-attachments/assets/9fc62375-a415-416c-bc54-bb5caf5083a3)
+
+  The key difference between lasso and ridge is that lasso can shrink some coefficients to **exactly zero**, effectively removing some features from the model.
+
+**Real-Time Example:**
+If you're building a model to predict the price of a car based on features like engine size, fuel type, horsepower, and luxury features, lasso regression can help you identify which features are most important by setting less important feature coefficients to zero.
+
+**Pros:**
+- Performs **automatic feature selection** (can eliminate unnecessary features by setting some coefficients to zero).
+- Useful when you have **many features**, and only a few are significant.
+
+**Cons:**
+- For some datasets, lasso may struggle if there are many correlated features, as it tends to select one and discard others.
+
+---
+
+### 3. **Elastic Net**
+
+**Definition:**
+Elastic Net is a combination of both **ridge** (L2) and **lasso** (L1) regression. It uses both the **L1** and **L2** regularization terms.
+
+- Elastic Net is ideal when you have highly correlated features and need the benefits of both **ridge** and **lasso**.
+  ![image](https://github.com/user-attachments/assets/6be4dea5-02c9-40f3-adef-b8d691f92a45)
+
+**Real-Time Example:**
+In genetic data, where thousands of predictors (genes) might be used to predict a disease, Elastic Net can deal with highly correlated genes by applying both ridge (L2) and lasso (L1) penalties, resulting in a more robust model.
+
+**Pros:**
+- Combines the strengths of both lasso and ridge regression.
+- Performs well when there are many features and some are highly correlated.
+  
+**Cons:**
+- More complex than ridge and lasso due to the combination of two regularization terms.
+- Requires tuning of both \( \lambda_1 \) and \( \lambda_2 \), making it slightly harder to optimize.
+
+---
+
+### **Relationship with Normal Linear Regression**
+
+- In **normal linear regression**, the goal is to fit the best linear relationship between the input features and the target variable by minimizing the **sum of squared errors**. It does not have any penalty terms, which can lead to **overfitting**, especially when there are many features or when the features are correlated.
+  
+- Ridge, lasso, and elastic net all add **regularization terms** to the cost function, penalizing large coefficients and reducing model complexity, thus **preventing overfitting**.
+
+---
+
+### **Summary of Pros and Cons**
+
+| Method        | Pros                                                                 | Cons                                                                                      |
+|---------------|----------------------------------------------------------------------|-------------------------------------------------------------------------------------------|
+| **Ridge**     | Reduces overfitting, works well with multicollinearity                | Does not perform feature selection; all features are kept                                  |
+| **Lasso**     | Performs feature selection by shrinking some coefficients to zero     | May discard important correlated features; can struggle with multicollinearity             |
+| **Elastic Net**| Balances feature selection and regularization; handles correlated features | More complex to tune, as both L1 and L2 penalties need to be optimized                     |
+
+### **When to Use Which Method?**
+- Use **ridge** when all features are important but you want to **reduce overfitting** due to multicollinearity.
+- Use **lasso** when you expect that only a **subset of features** is important and want automatic **feature selection**.
+- Use **elastic net** when you have **many correlated features** and want to **combine the benefits** of both lasso and ridge.
+
+--- 
+### 5 Types of Cross-Validation
+
+**Cross-validation** is a technique used to evaluate the performance of a machine learning model by splitting the dataset into subsets to test the model’s ability to generalize to unseen data. The goal is to avoid overfitting and improve the model’s performance on unseen data.
+![image](https://github.com/user-attachments/assets/47f996d4-4388-4c5c-838c-3f543ca4c8f7)
+
+Here are five common types of cross-validation:
+
+---
+
+### 1. **K-Fold Cross-Validation**
+
+In **K-fold cross-validation**, the dataset is split into **K equal-sized folds** or subsets. The model is trained on **K-1 folds** and tested on the **remaining fold**. This process is repeated **K times**, each time with a different fold used for testing. The final performance is the **average of the K results**.
+
+- **How it works:**
+  - The dataset is divided into K parts.
+  - In each iteration, a different part is used as the test set while the rest is used as the training set.
+  - The results are averaged across all iterations.
+  
+- **Example:** If K=5, the dataset is split into 5 folds. The model is trained on 4 folds and tested on the remaining fold. This is repeated 5 times, and the average performance is taken as the final score.
+
+- **Pros:** 
+  - Efficient in utilizing the full dataset.
+  - Provides a more accurate estimate of model performance.
+  
+- **Cons:**
+  - Computationally expensive, especially for large datasets.
+
+---
+
+### 2. **Stratified K-Fold Cross-Validation**
+
+**Stratified K-fold cross-validation** is similar to K-fold cross-validation, but it ensures that the **distribution of classes** (in classification problems) is maintained in each fold. This is important when dealing with **imbalanced datasets** to ensure that each fold has a representative proportion of each class.
+
+- **How it works:**
+  - The dataset is split into K folds, but the splitting process ensures that each fold has the same proportion of different classes as the original dataset.
+
+- **Example:** If the dataset contains 80% of class A and 20% of class B, each fold will maintain this ratio.
+
+- **Pros:** 
+  - Especially useful for imbalanced classification problems.
+  - Reduces the bias that can occur if some classes are over- or under-represented in different folds.
+
+- **Cons:**
+  - Like K-fold, it can be computationally expensive.
+
+---
+
+### 3. **Leave-One-Out Cross-Validation (LOO CV)**
+
+In **Leave-One-Out Cross-Validation**, the model is trained on **all but one** data point and tested on that **single data point**. This process is repeated for **each data point** in the dataset. LOO CV is a special case of K-fold cross-validation where **K equals the number of data points**.
+
+- **How it works:**
+  - In each iteration, the model is trained on all the data points except one, and the one left out is used for testing.
+  - This is repeated for each data point in the dataset.
+
+- **Example:** If the dataset has 100 samples, the model is trained on 99 samples and tested on 1, repeated 100 times.
+
+- **Pros:**
+  - Uses all data for training, so it gives an unbiased estimate.
+  
+- **Cons:**
+  - Extremely **computationally expensive**, especially for large datasets.
+  - Results can have high variance, as the model is trained on almost all data except one point.
+
+---
+
+### 4. **Time Series Cross-Validation (Rolling or Forward Chaining)**
+
+In **Time Series Cross-Validation**, data is split based on time, which is important for **time series forecasting**. It ensures that **future data is never used to predict past data**. It is also called **rolling window cross-validation** or **forward chaining**.
+
+- **How it works:**
+  - Data is split into training and testing sets in a **sequential manner**, respecting the time order.
+  - In each iteration, a larger portion of data is used for training, and the next time point is used for testing.
+
+- **Example:** If you have a time series from January to December, the model is trained on data up to March and tested on April, then trained up to April and tested on May, and so on.
+
+- **Pros:**
+  - Suitable for time series problems where the order of data matters.
+  
+- **Cons:**
+  - Can be challenging if the data has seasonality or trends that need to be captured over time.
+![image](https://github.com/user-attachments/assets/d52accaf-6754-4d61-a32b-d06ffec39281)
+
+---
+
+### 5. **Hold-Out Cross-Validation (Train-Test Split)**
+
+**Hold-out cross-validation** is the simplest form of cross-validation, where the dataset is split into **two sets**: a **training set** and a **test set**. The model is trained on the training set and evaluated on the test set.
+
+- **How it works:**
+  - You randomly split the dataset into two parts: one for training and one for testing.
+  - The split is often 70% for training and 30% for testing, or 80%/20%.
+
+- **Example:** If you have 1000 samples, you might use 700 samples for training and 300 samples for testing.
+
+- **Pros:**
+  - Quick and easy to implement.
+  
+- **Cons:**
+  - **Less reliable**, as the evaluation is based on only one test set.
+  - Can lead to overfitting or underfitting if the train-test split is not representative.
+![image](https://github.com/user-attachments/assets/55c4068e-533a-4c80-8250-450baea7803f)
+
+---
+
+### **Summary Table:**
+
+| **Type**                        | **Description**                                           | **Use Case**                                  | **Pros**                                                | **Cons**                                              |
+|----------------------------------|-----------------------------------------------------------|------------------------------------------------|----------------------------------------------------------|-------------------------------------------------------|
+| **K-Fold**                       | Dataset split into K parts, train on K-1 parts, test on 1 | General use case                              | Uses all data, gives more reliable estimates              | Computationally expensive                             |
+| **Stratified K-Fold**            | Ensures class balance in each fold                        | Classification with imbalanced data           | Better for imbalanced data, reduces bias                  | Same as K-Fold                                        |
+| **Leave-One-Out (LOO CV)**       | Trains on all data except 1 point                         | Small datasets                                | Unbiased estimate                                         | Very computationally expensive, high variance         |
+| **Time Series (Rolling/Forward)**| Respects time order in training/testing                   | Time series forecasting                       | Keeps time dependency intact, good for temporal data      | May not capture long-term patterns                    |
+| **Hold-Out (Train-Test Split)**  | Simple split into training and test sets                  | Quick evaluation                              | Quick and easy to implement                               | Results may vary based on the split, less reliable     |
+
+---
+
+
